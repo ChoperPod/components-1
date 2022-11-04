@@ -4,5 +4,5 @@ const counter = ref(0);
 const increment = () => counter.value++;
 </script>
 <template>
-    <button @click="increment">Counter {{ counter }}</button>
+    <button class="btn btn-success" @click="increment">Counter {{ counter }}</button>
 </template>
