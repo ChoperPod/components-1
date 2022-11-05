@@ -3,14 +3,21 @@ import { ref } from 'vue';
 import BlogPost from './Components/BlogPost.vue';
 import ButtonCounter from './Components/ButtonCounter.vue'
 import PaginatePost from './Components/PaginatePost.vue'
+import LoadingSp from "./Components/LoadingSp.vue"
 
-const posts = ref([
-/*  { title: 'post 1', id: 1, body: 'descripcion 1', colorText: "primary" },
-  { title: 'post 2', id: 2, body: 'descripcion 2', colorText: "secondary" },
-  { title: 'post 3', id: 3, body: 'descripcion 3', colorText: "success" },
-  { title: 'post 4', id: 4, colorText: "danger" },*/
-
-])
+const posts = ref([])
+const PostxPag = 10
+const inicio = ref(0)
+const fin = ref(PostxPag)
+const loading = ref(true)
+const next = () => {
+  inicio.value = inicio.value + PostxPag
+  fin.value = fin.value + PostxPag
+}
+const prev = () => {
+  inicio.value = inicio.value - PostxPag
+  fin.value = fin.value - PostxPag
+}
 
 const favorito = ref('');
 const CambiarFavorito = (title) => {
@@ -18,30 +25,30 @@ const CambiarFavorito = (title) => {
 };
 
 fetch('https://jsonplaceholder.typicode.com/posts')
-.then((res) => res.json())
-.then((data) => {posts.value = data;});//console.log(data))
+  .then((res) => res.json())
+  .then((data) => { posts.value = data; })
+  .finally(() => {
+    setTimeout(() => {
+      loading.value = false
+    }, 1300);
+  })
 
 
 </script>
 
 
 <template>
-  <div class="container">
+  <LoadingSp v-if="loading" />
+  <div class="container" v-else>
     <h1>APP</h1>
-    <h2>Mi post favorito: {{favorito}}</h2>
-    <PaginatePost class="mb-2"/><br>
+    <h2>Mi post favorito: {{ favorito }}</h2>
+    <PaginatePost @next="next" @prev="prev" class="mb-2" :inicio="inicio" :fin="fin" :maxLength="posts.length" /><br>
     <!--<button @click="increment">{{ counter }}</button>-->
     <ButtonCounter />
     <button-counter />
     <br><br>
-    <BlogPost 
-      v-for="post in posts.slice(0,10)" 
-      :key="post.id" 
-      :title="post.title" 
-      :id="post.id" 
-      :body="post.body"
-      :CambiarFavorito="CambiarFavorito"
-      class="mb-2">
+    <BlogPost v-for="post in posts.slice(inicio, fin)" :key="post.id" :title="post.title" :id="post.id"
+      :body="post.body" :CambiarFavorito="CambiarFavorito" class="mb-2">
     </BlogPost><br>
 
   </div>
