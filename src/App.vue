@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import BlogPost from './Components/BlogPost.vue';
 import ButtonCounter from './Components/ButtonCounter.vue'
 import PaginatePost from './Components/PaginatePost.vue'
@@ -24,16 +24,43 @@ const CambiarFavorito = (title) => {
   favorito.value = title
 };
 
-fetch('https://jsonplaceholder.typicode.com/posts')
-  .then((res) => res.json())
-  .then((data) => { posts.value = data; })
-  .finally(() => {
+// Opcion correcta para consumir API´s
+const fetchData = async () => {
+  try {
+    const res = await fetch('https://jsonplaceholder.typicode.com/posts')
+    posts.value = await res.json()
+  } catch (error) {
+    console.log(error)
+  } finally {
     setTimeout(() => {
       loading.value = false
     }, 1300);
-  })
+  }
+};
 
+fetchData();
+// onMounted(async () => {
+//   //loading.value = true
+//   try {
+//     const res = await fetch('https://jsonplaceholder.typicode.com/posts')
+//     posts.value = await res.json()
+//   } catch (error) {
+//     console.log(error)
+//   } finally {
+//     setTimeout(() => {
+//       loading.value = false
+//     }, 1300);
+//   }
+// });
 
+// fetch('https://jsonplaceholder.typicode.com/posts')
+//   .then((res) => res.json())
+//   .then((data) => { posts.value = data; })
+//   .finally(() => {
+//     setTimeout(() => {
+//       loading.value = false
+//     }, 1300);
+//   })
 </script>
 
 
@@ -50,7 +77,6 @@ fetch('https://jsonplaceholder.typicode.com/posts')
     <BlogPost v-for="post in posts.slice(inicio, fin)" :key="post.id" :title="post.title" :id="post.id"
       :body="post.body" :CambiarFavorito="CambiarFavorito" class="mb-2">
     </BlogPost><br>
-
   </div>
 </template>
 
